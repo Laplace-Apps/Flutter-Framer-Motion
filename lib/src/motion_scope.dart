@@ -14,6 +14,7 @@ class MotionScope extends InheritedWidget {
   const MotionScope({
     super.key,
     required this.animate,
+    required this.initial,
     required this.orchestration,
     required this.registry,
     required this.disableAnimations,
@@ -21,6 +22,7 @@ class MotionScope extends InheritedWidget {
   });
 
   final String? animate;
+  final String? initial;
   final MotionTransition? orchestration;
   final MotionStaggerRegistry registry;
   final bool disableAnimations;
@@ -32,6 +34,7 @@ class MotionScope extends InheritedWidget {
   @override
   bool updateShouldNotify(MotionScope oldWidget) {
     return animate != oldWidget.animate ||
+        initial != oldWidget.initial ||
         orchestration != oldWidget.orchestration ||
         disableAnimations != oldWidget.disableAnimations;
   }

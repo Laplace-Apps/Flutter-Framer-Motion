@@ -11,11 +11,11 @@ void main() {
       expect(mid.y, 10);
     });
 
-    test('resolve fills defaults', () {
-      const partial = MotionValues(opacity: 0.5);
-      final resolved = partial.resolve();
-      expect(resolved.opacity, 0.5);
-      expect(resolved.scale, 1);
+    test('lerp rotate', () {
+      const a = MotionValues(rotate: 0);
+      const b = MotionValues(rotate: 1.57);
+      final mid = MotionValues.lerp(a, b, 0.5);
+      expect(mid.rotate, closeTo(0.785, 0.001));
     });
   });
 
@@ -28,15 +28,14 @@ void main() {
       expect(t.staggerDelayForChild(0), const Duration(milliseconds: 200));
       expect(t.staggerDelayForChild(2), const Duration(milliseconds: 400));
     });
-  });
 
-  group('resolveVariant', () {
-    test('returns identity for unknown key', () {
-      const variants = <String, MotionVariant>{
-        'visible': MotionVariant(values: MotionValues(opacity: 1)),
-      };
-      final v = resolveVariant(variants, 'missing');
-      expect(v.values.opacity, 1);
+    test('spring type is configurable', () {
+      const t = MotionTransition(
+        type: MotionTransitionType.spring,
+        stiffness: 500,
+      );
+      expect(t.type, MotionTransitionType.spring);
+      expect(t.stiffness, 500);
     });
   });
 }

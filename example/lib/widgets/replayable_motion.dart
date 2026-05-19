@@ -1,6 +1,8 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:motion_flutter/motion_flutter.dart';
 
+/// Runs [initial] -> [animate] and supports replay via subtree remount.
 class ReplayableMotion extends StatefulWidget {
   const ReplayableMotion({
     super.key,
@@ -21,26 +23,33 @@ class ReplayableMotion extends StatefulWidget {
 
 class ReplayableMotionState extends State<ReplayableMotion> {
   String _animate = 'hidden';
+  int _generation = 0;
 
   @override
   void initState() {
     super.initState();
     if (widget.autoPlay) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
         if (mounted) setState(() => _animate = 'visible');
       });
     }
   }
 
+  /// Remounts the motion subtree so stagger/hero replay from a clean state.
   Future<void> replay() async {
-    setState(() => _animate = 'hidden');
-    await Future<void>.delayed(const Duration(milliseconds: 50));
-    if (mounted) setState(() => _animate = 'visible');
+    setState(() {
+      _generation++;
+      _animate = 'hidden';
+    });
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (mounted) setState(() => _animate = 'visible');
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Motion(
+      key: ValueKey('replay-$_generation'),
       variants: widget.variants,
       initial: 'hidden',
       animate: _animate,
